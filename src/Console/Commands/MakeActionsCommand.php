@@ -580,6 +580,16 @@ final class {{ actionClass }} extends BaseBulkDeleteAction
     {
         return {{ model }}::class;
     }
+
+    /**
+     * Usage Examples:
+     *
+     * // Delete multiple records by IDs:
+     * {{ actionClass }}::run(ids: [1, 2, 3, 4, 5]);
+     *
+     * // Force delete (permanently) records:
+     * {{ actionClass }}::run(ids: [1, 2, 3], forceDelete: true);
+     */
 }
 STUB;
     }
@@ -615,6 +625,22 @@ final class {{ actionClass }} extends BaseBulkUpdateAction
         // Add any data transformations here
         return $data;
     }
+
+    /**
+     * Usage Examples:
+     *
+     * // Update multiple records by IDs:
+     * {{ actionClass }}::run(
+     *     ids: [1, 2, 3, 4, 5],
+     *     data: ['status' => 'active', 'updated_by' => auth()->id()]
+     * );
+     *
+     * // Update with prepared/transformed data:
+     * {{ actionClass }}::run(
+     *     ids: [1, 2, 3],
+     *     data: ['is_verified' => true]
+     * );
+     */
 }
 STUB;
     }
