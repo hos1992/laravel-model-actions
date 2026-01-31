@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 abstract class IndexAction extends Action
 {
     protected ?Model $model;
-    protected int $perPage;
+    protected ?int $perPage;
     protected bool $getAll = false;
-    protected string $orderKey = 'id';
-    protected string $orderDir = 'DESC';
+    protected ?string $orderKey = 'id';
+    protected ?string $orderDir = 'DESC';
     protected array $select = [];
     protected array $with = [];
     protected array $withOut = [];
