@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }}\{{ model }};
+
+use App\Actions\Action;
+use App\Models\{{ model }};
+
+final class {{ class }} extends Action
+{
+    /**
+     * Create a new action instance.
+     */
+    public function __construct(
+        // Add your constructor parameters here
+    ) {}
+
+    /**
+     * Execute the action.
+     */
+    public function handle(): mixed
+    {
+        // Add your action logic here
+        
+        return null;
+    }
+
+    /**
+     * Called before the action executes.
+     */
+    protected function before(): void
+    {
+        // Pre-execution logic
+    }
+
+    /**
+     * Called after the action executes.
+     */
+    protected function after(mixed $result): mixed
+    {
+        // Post-execution logic
+        return $result;
+    }
+}

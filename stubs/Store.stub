@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\_Base\StoreAction;
+use {{ modelPath }}\{{ model }};
+
+final class {{ actionClass }} extends StoreAction
+{
+    /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param array $data The data to store
+     */
+    public function __construct(
+        private array $data
+    ) {
+        parent::__construct(
+            model: new {{ model }}(),
+            data: $this->data,
+        );
+    }
+
+    /**
+     * Customize the store logic by overriding __invoke().
+     * Uncomment and modify as needed.
+     */
+    // public function __invoke(): mixed
+    // {
+    //     // Add custom validation or transformation here
+    //     // $this->validateData();
+    //     
+    //     return parent::__invoke();
+    // }
+
+    /**
+     * Add custom validation logic.
+     */
+    // protected function validateData(): void
+    // {
+    //     // Your validation logic here
+    // }
+}

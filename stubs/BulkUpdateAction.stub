@@ -1,0 +1,65 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\Action;
+
+class {{ class }}BulkUpdateAction extends Action
+{
+    /**
+     * Create a new BulkUpdateAction instance.
+     *
+     * @param array $ids The IDs of records to update
+     * @param array $data The data to update
+     */
+    public function __construct(
+        protected array $ids,
+        protected array $data
+    ) {}
+
+    /**
+     * Get the model class.
+     */
+    protected function model(): string
+    {
+        return \App\Models\{{ class }}::class;
+    }
+
+    /**
+     * Execute the bulk update action.
+     */
+    public function handle(): int
+    {
+        if (empty($this->ids) || empty($this->data)) {
+            return 0;
+        }
+
+        return $this->model()::whereIn('id', $this->ids)
+            ->update($this->prepareData($this->data));
+    }
+
+    /**
+     * Prepare the data before updating.
+     */
+    protected function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * Called before the action executes.
+     */
+    protected function before(): void
+    {
+        // Add pre-update logic here
+    }
+
+    /**
+     * Called after the action executes.
+     */
+    protected function after(mixed $result): mixed
+    {
+        // Add post-update logic here
+        return $result;
+    }
+}

@@ -1,0 +1,17 @@
+<?php
+
+namespace {{ namespace }};
+
+use HosnyAdeeb\ModelActions\Traits\Runnable;
+
+abstract class Action
+{
+    use Runnable;
+
+    /**
+     * Execute the action.
+     *
+     * @return mixed
+     */
+    abstract public function __invoke(): mixed;
+}

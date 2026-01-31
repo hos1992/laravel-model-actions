@@ -1,0 +1,69 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\Action;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+abstract class ShowAction extends Action
+{
+    /**
+     * Create a new ShowAction instance.
+     *
+     * @param Model|null $model The model instance to query
+     * @param string $selectKey The column to select by
+     * @param string|null $selectValue The value to match
+     * @param string $selectOperator The comparison operator
+     * @param array $select Columns to select
+     * @param array $with Relations to eager load
+     * @param array $withOut Relations to exclude
+     * @param string $orderKey Column to order by
+     * @param string $orderDir Order direction
+     */
+    public function __construct(
+        private ?Model  $model,
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+        private array   $select = [],
+        private array   $with = [],
+        private array   $withOut = [],
+        private string  $orderKey = 'id',
+        private string  $orderDir = 'DESC',
+    ) {
+    }
+
+    /**
+     * Execute the show action.
+     *
+     * @return Model|Builder|null
+     * @throws Exception
+     */
+    public function __invoke(): Model|Builder|null
+    {
+        if (!$this->model instanceof Model) {
+            throw new Exception('There is no model instance passed to the action!');
+        }
+
+        $query = $this->model->query();
+        $query->where($this->selectKey, $this->selectOperator, $this->selectValue);
+
+        if (count($this->select)) {
+            $query->select($this->select);
+        }
+
+        if (count($this->with)) {
+            $query->with($this->with);
+        }
+
+        if (count($this->withOut)) {
+            $query->withOut($this->withOut);
+        }
+
+        $query->orderBy($this->orderKey, $this->orderDir);
+
+        return $query->first();
+    }
+}

@@ -1,0 +1,62 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\Action;
+
+class {{ class }}BulkDeleteAction extends Action
+{
+    /**
+     * Create a new BulkDeleteAction instance.
+     *
+     * @param array $ids The IDs of records to delete
+     * @param bool $forceDelete Whether to force delete (permanently)
+     */
+    public function __construct(
+        protected array $ids,
+        protected bool $forceDelete = false
+    ) {}
+
+    /**
+     * Get the model class.
+     */
+    protected function model(): string
+    {
+        return \App\Models\{{ class }}::class;
+    }
+
+    /**
+     * Execute the bulk delete action.
+     */
+    public function handle(): int
+    {
+        if (empty($this->ids)) {
+            return 0;
+        }
+
+        $query = $this->model()::whereIn('id', $this->ids);
+
+        if ($this->forceDelete) {
+            return $query->forceDelete();
+        }
+
+        return $query->delete();
+    }
+
+    /**
+     * Called before the action executes.
+     */
+    protected function before(): void
+    {
+        // Add pre-delete logic here
+    }
+
+    /**
+     * Called after the action executes.
+     */
+    protected function after(mixed $result): mixed
+    {
+        // Add post-delete logic here
+        return $result;
+    }
+}

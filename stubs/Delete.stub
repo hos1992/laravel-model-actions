@@ -1,0 +1,62 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\_Base\DeleteAction;
+use {{ modelPath }}\{{ model }};
+
+final class {{ actionClass }} extends DeleteAction
+{
+    /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param string $selectKey Column to select by
+     * @param string|null $selectValue Value to match
+     * @param string $selectOperator Comparison operator
+     */
+    public function __construct(
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+    ) {
+        parent::__construct(
+            model: new {{ model }}(),
+            selectKey: $this->selectKey,
+            selectValue: $this->selectValue,
+            selectOperator: $this->selectOperator,
+        );
+    }
+
+    /**
+     * Customize the delete logic by overriding __invoke().
+     * Uncomment and modify as needed.
+     */
+    // public function __invoke(): mixed
+    // {
+    //     // Add custom logic before deletion
+    //     // $this->beforeDelete();
+    //     
+    //     $result = parent::__invoke();
+    //     
+    //     // Add custom logic after deletion
+    //     // $this->afterDelete();
+    //     
+    //     return $result;
+    // }
+
+    /**
+     * Add custom logic before deletion.
+     */
+    // protected function beforeDelete(): void
+    // {
+    //     // Your before delete logic here
+    // }
+
+    /**
+     * Add custom logic after deletion.
+     */
+    // protected function afterDelete(): void
+    // {
+    //     // Your after delete logic here
+    // }
+}

@@ -1,0 +1,44 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\_Base\ShowAction;
+use {{ modelPath }}\{{ model }};
+
+final class {{ actionClass }} extends ShowAction
+{
+    /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param string $selectKey Column to select by
+     * @param string|null $selectValue Value to match
+     * @param string $selectOperator Comparison operator
+     * @param array $select Columns to select
+     * @param array $with Relations to eager load
+     * @param array $withOut Relations to exclude
+     * @param string $orderKey Column to order by
+     * @param string $orderDir Order direction
+     */
+    public function __construct(
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+        private array   $select = [],
+        private array   $with = [],
+        private array   $withOut = [],
+        private string  $orderKey = 'id',
+        private string  $orderDir = 'DESC',
+    ) {
+        parent::__construct(
+            model: new {{ model }}(),
+            selectKey: $this->selectKey,
+            selectValue: $this->selectValue,
+            selectOperator: $this->selectOperator,
+            select: $this->select,
+            with: $this->with,
+            withOut: $this->withOut,
+            orderKey: $this->orderKey,
+            orderDir: $this->orderDir,
+        );
+    }
+}

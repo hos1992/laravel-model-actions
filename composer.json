@@ -1,0 +1,55 @@
+{
+  "name": "hosnyadeeb/laravel-model-actions",
+  "description": "A Laravel package for generating action classes for models with CRUD operations",
+  "keywords": [
+    "laravel",
+    "actions",
+    "model",
+    "crud",
+    "generator",
+    "artisan"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Hosny Adeeb",
+      "email": "hosnyadeeb@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "illuminate/console": "^10.0|^11.0|^12.0",
+    "illuminate/database": "^10.0|^11.0|^12.0",
+    "illuminate/filesystem": "^10.0|^11.0|^12.0",
+    "illuminate/support": "^10.0|^11.0|^12.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^8.0|^9.0|^10.0",
+    "phpunit/phpunit": "^10.0|^11.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "HosnyAdeeb\\ModelActions\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HosnyAdeeb\\ModelActions\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "HosnyAdeeb\\ModelActions\\ModelActionsServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

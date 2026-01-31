@@ -1,0 +1,73 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\_Base\IndexAction;
+use {{ modelPath }}\{{ model }};
+use Illuminate\Database\Eloquent\Builder;
+
+final class {{ actionClass }} extends IndexAction
+{
+    /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param int|null $perPage Number of items per page
+     * @param bool $getAll Whether to get all records
+     * @param string|null $orderKey Column to order by
+     * @param string|null $orderDir Order direction (ASC/DESC)
+     * @param array $select Columns to select
+     * @param array $with Relations to eager load
+     * @param array $withOut Relations to exclude
+     * @param array $where Where conditions
+     * @param array $request Additional request data for custom queries
+     */
+    public function __construct(
+        private ?int    $perPage = null,
+        private bool    $getAll = false,
+        private ?string $orderKey = null,
+        private ?string $orderDir = null,
+        private array   $select = [],
+        private array   $with = [],
+        private array   $withOut = [],
+        private array   $where = [],
+        private array   $request = [],
+    ) {
+        parent::__construct(
+            model: new {{ model }}(),
+            perPage: $this->perPage,
+            getAll: $this->getAll,
+            orderKey: $this->orderKey,
+            orderDir: $this->orderDir,
+            select: $this->select,
+            with: $this->with,
+            withOut: $this->withOut,
+            where: $this->where,
+        );
+    }
+
+    /**
+     * Add custom query logic here.
+     * This method is called by the parent class during query building.
+     *
+     * @param Builder $builder
+     * @return void
+     */
+    protected function customBuilder(Builder $builder): void
+    {
+        // Add your custom query logic here
+        // Example:
+        // if ($this->request['search'] ?? null) {
+        //     $builder->where('name', 'like', '%' . $this->request['search'] . '%');
+        // }
+    }
+
+    /**
+     * Get the request data.
+     *
+     * @return array
+     */
+    protected function getRequest(): array
+    {
+        return $this->request;
+    }
+}

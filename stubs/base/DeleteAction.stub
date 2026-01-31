@@ -1,0 +1,59 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Actions\Action;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+
+abstract class DeleteAction extends Action
+{
+    /**
+     * Create a new DeleteAction instance.
+     *
+     * @param Model|null $model The model instance to delete
+     * @param string $selectKey The column to select by
+     * @param string|null $selectValue The value to match
+     * @param string $selectOperator The comparison operator
+     */
+    public function __construct(
+        private ?Model  $model,
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+    ) {
+    }
+
+    /**
+     * Execute the delete action.
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function __invoke(): mixed
+    {
+        if (!$this->model instanceof Model) {
+            throw new Exception('There is no model instance passed to the action!');
+        }
+
+        $row = $this->model->where($this->selectKey, $this->selectOperator, $this->selectValue)->first();
+        
+        if (!$row) {
+            throw new Exception('No record found for the given key!');
+        }
+
+        $row->delete();
+
+        return true;
+    }
+
+    /**
+     * Get the model instance.
+     *
+     * @return Model|null
+     */
+    protected function getModel(): ?Model
+    {
+        return $this->model;
+    }
+}
