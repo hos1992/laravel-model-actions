@@ -171,8 +171,12 @@ class MakeActionsCommand extends Command
             $this->files->makeDirectory($baseActionsPath, 0755, true);
 
             foreach ($this->actionTypes as $type) {
-                $stubPath = $this->getBaseActionTypeStubPath($type);
                 $content = $this->getBaseActionTypeStub($type);
+
+                if (empty($content)) {
+                    continue;
+                }
+
                 $targetPath = $baseActionsPath . DIRECTORY_SEPARATOR . "{$type}Action.php";
 
                 $this->files->put($targetPath, $content);
