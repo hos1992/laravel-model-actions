@@ -5,6 +5,7 @@ namespace HosnyAdeeb\ModelActions\Actions\_Base;
 use HosnyAdeeb\ModelActions\Actions\Action;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 abstract class UpdateAction extends Action
 {
@@ -16,6 +17,7 @@ abstract class UpdateAction extends Action
      * @param string $selectKey The column to select by
      * @param string|null $selectValue The value to match
      * @param string $selectOperator The comparison operator
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private ?Model  $model,
@@ -23,6 +25,7 @@ abstract class UpdateAction extends Action
         private string  $selectKey = 'id',
         private ?string $selectValue = null,
         private string  $selectOperator = '=',
+        private bool    $useTransaction = false,
     ) {}
 
     /**
@@ -37,15 +40,96 @@ abstract class UpdateAction extends Action
             throw new Exception('There is no model instance passed to the action!');
         }
 
-        $row = $this->model->where($this->selectKey, $this->selectOperator, $this->selectValue)->first();
+        $execute = function () {
+            $row = $this->model->where($this->selectKey, $this->selectOperator, $this->selectValue)->first();
 
-        if (!$row) {
-            throw new Exception('No record found for the given key!');
+            if (!$row) {
+                throw new Exception('No record found for the given key!');
+            }
+
+            $preparedData = $this->prepareData($this->data);
+
+            $this->beforeHandle($row, $preparedData);
+            $this->dispatchBeforeEvent($row, $preparedData);
+
+            $row->update($preparedData);
+            $updated = $row->fresh();
+
+            $this->dispatchAfterEvent($updated);
+            return $this->afterHandle($updated);
+        };
+
+        return $this->useTransaction ? DB::transaction($execute) : $execute();
+    }
+
+    /**
+     * Prepare the data before updating.
+     * Override this method to transform data before update.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * Called before the action executes.
+     *
+     * @param Model $model The model being updated
+     * @param array $data The prepared data
+     */
+    protected function beforeHandle(Model $model, array $data): void
+    {
+        // Override in subclass for pre-update logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-update logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event before update.
+     *
+     * @param Model $model
+     * @param array $data
+     */
+    protected function dispatchBeforeEvent(Model $model, array $data): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.updating', [$model, $data, $this]);
         }
+    }
 
-        $row->update($this->data);
+    /**
+     * Dispatch event after update.
+     *
+     * @param Model $model
+     */
+    protected function dispatchAfterEvent(Model $model): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.updated', [$model, $this]);
+        }
+    }
 
-        return $row->fresh();
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
+        return true;
     }
 
     /**

@@ -355,6 +355,8 @@ final class {{ actionClass }} extends IndexAction
      * @param array $with Relations to eager load
      * @param array $withOut Relations to exclude
      * @param array $where Where conditions
+     * @param string|null $searchTerm Search term to filter records
+     * @param array $searchColumns Columns to search in
      * @param array $request Additional request data for custom queries
      */
     public function __construct(
@@ -366,6 +368,8 @@ final class {{ actionClass }} extends IndexAction
         private array   $with = [],
         private array   $withOut = [],
         private array   $where = [],
+        private ?string $searchTerm = null,
+        private array   $searchColumns = [],
         private array   $request = [],
     ) {
         parent::__construct(
@@ -378,6 +382,8 @@ final class {{ actionClass }} extends IndexAction
             with: $this->with,
             withOut: $this->withOut,
             where: $this->where,
+            searchTerm: $this->searchTerm,
+            searchColumns: $this->searchColumns,
         );
     }
 
@@ -420,6 +426,7 @@ final class {{ actionClass }} extends ShowAction
      * @param array $withOut Relations to exclude
      * @param string $orderKey Column to order by
      * @param string $orderDir Order direction
+     * @param bool $failIfNotFound Whether to throw exception if not found
      */
     public function __construct(
         private string  $selectKey = 'id',
@@ -430,6 +437,7 @@ final class {{ actionClass }} extends ShowAction
         private array   $withOut = [],
         private string  $orderKey = 'id',
         private string  $orderDir = 'DESC',
+        private bool    $failIfNotFound = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
@@ -441,6 +449,7 @@ final class {{ actionClass }} extends ShowAction
             withOut: $this->withOut,
             orderKey: $this->orderKey,
             orderDir: $this->orderDir,
+            failIfNotFound: $this->failIfNotFound,
         );
     }
 }
@@ -466,14 +475,26 @@ final class {{ actionClass }} extends StoreAction
      * Create a new {{ actionClass }} instance.
      *
      * @param array $data The data to store
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        private array $data
+        private array $data,
+        private bool  $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
             data: $this->data,
+            useTransaction: $this->useTransaction,
         );
+    }
+
+    /**
+     * Prepare the data before storing.
+     */
+    protected function prepareData(array $data): array
+    {
+        // Add any data transformations here
+        return $data;
     }
 }
 STUB;
@@ -501,12 +522,14 @@ final class {{ actionClass }} extends UpdateAction
      * @param string $selectKey Column to select by
      * @param string|null $selectValue Value to match
      * @param string $selectOperator Comparison operator
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private array   $data,
         private string  $selectKey = 'id',
         private ?string $selectValue = null,
         private string  $selectOperator = '=',
+        private bool    $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
@@ -514,7 +537,17 @@ final class {{ actionClass }} extends UpdateAction
             selectKey: $this->selectKey,
             selectValue: $this->selectValue,
             selectOperator: $this->selectOperator,
+            useTransaction: $this->useTransaction,
         );
+    }
+
+    /**
+     * Prepare the data before updating.
+     */
+    protected function prepareData(array $data): array
+    {
+        // Add any data transformations here
+        return $data;
     }
 }
 STUB;
@@ -541,17 +574,23 @@ final class {{ actionClass }} extends DeleteAction
      * @param string $selectKey Column to select by
      * @param string|null $selectValue Value to match
      * @param string $selectOperator Comparison operator
+     * @param bool $forceDelete Whether to force delete (permanently)
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private string  $selectKey = 'id',
         private ?string $selectValue = null,
         private string  $selectOperator = '=',
+        private bool    $forceDelete = false,
+        private bool    $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
             selectKey: $this->selectKey,
             selectValue: $this->selectValue,
             selectOperator: $this->selectOperator,
+            forceDelete: $this->forceDelete,
+            useTransaction: $this->useTransaction,
         );
     }
 }

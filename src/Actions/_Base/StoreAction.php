@@ -5,6 +5,7 @@ namespace HosnyAdeeb\ModelActions\Actions\_Base;
 use HosnyAdeeb\ModelActions\Actions\Action;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 abstract class StoreAction extends Action
 {
@@ -13,10 +14,12 @@ abstract class StoreAction extends Action
      *
      * @param Model|null $model The model instance to create
      * @param array $data The data to store
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private ?Model $model,
         private array  $data,
+        private bool   $useTransaction = false,
     ) {}
 
     /**
@@ -31,7 +34,87 @@ abstract class StoreAction extends Action
             throw new Exception('There is no model instance passed to the action!');
         }
 
-        return $this->model->create($this->data);
+        $execute = function () {
+            $preparedData = $this->prepareData($this->data);
+
+            $this->beforeHandle($preparedData);
+            $this->dispatchBeforeEvent($preparedData);
+
+            $created = $this->model->create($preparedData);
+
+            $this->dispatchAfterEvent($created);
+            return $this->afterHandle($created);
+        };
+
+        return $this->useTransaction ? DB::transaction($execute) : $execute();
+    }
+
+    /**
+     * Prepare the data before storing.
+     * Override this method to transform data before store.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * Called before the action executes.
+     *
+     * @param array $data The prepared data
+     */
+    protected function beforeHandle(array $data): void
+    {
+        // Override in subclass for pre-store logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-store logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event before store.
+     *
+     * @param array $data
+     */
+    protected function dispatchBeforeEvent(array $data): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.creating', [$data, $this]);
+        }
+    }
+
+    /**
+     * Dispatch event after store.
+     *
+     * @param Model $model
+     */
+    protected function dispatchAfterEvent(Model $model): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.created', [$model, $this]);
+        }
+    }
+
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
+        return true;
     }
 
     /**

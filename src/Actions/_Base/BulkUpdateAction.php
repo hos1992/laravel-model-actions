@@ -5,6 +5,7 @@ namespace HosnyAdeeb\ModelActions\Actions\_Base;
 use HosnyAdeeb\ModelActions\Actions\Action;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 abstract class BulkUpdateAction extends Action
 {
@@ -19,15 +20,35 @@ abstract class BulkUpdateAction extends Action
     protected array $data = [];
 
     /**
+     * Whether to wrap in a database transaction.
+     */
+    protected bool $useTransaction = false;
+
+    /**
+     * Chunk size for processing large datasets.
+     */
+    protected int $chunkSize = 1000;
+
+    /**
      * Create a new BulkUpdateAction instance.
      *
      * @param array $ids The IDs of records to update
      * @param array $data The data to update
+     * @param bool $useTransaction Whether to wrap in a database transaction
+     * @param int $chunkSize Chunk size for large datasets (0 = no chunking)
      */
-    public function __construct(array $ids, array $data)
-    {
+    public function __construct(
+        array $ids,
+        array $data,
+        bool $useTransaction = false,
+        int $chunkSize = 0
+    ) {
         $this->ids = $ids;
         $this->data = $data;
+        $this->useTransaction = $useTransaction;
+        if ($chunkSize > 0) {
+            $this->chunkSize = $chunkSize;
+        }
     }
 
     /**
@@ -55,12 +76,35 @@ abstract class BulkUpdateAction extends Action
             return 0;
         }
 
-        /** @var Model $instance */
-        $instance = new $modelClass();
+        $execute = function () use ($modelClass) {
+            /** @var Model $instance */
+            $instance = new $modelClass();
+            $preparedData = $this->prepareData($this->data);
 
-        return $instance->newQuery()
-            ->whereIn($instance->getKeyName(), $this->ids)
-            ->update($this->prepareData($this->data));
+            $this->beforeHandle($this->ids, $preparedData);
+            $this->dispatchBeforeEvent($this->ids, $preparedData);
+
+            $totalUpdated = 0;
+
+            // Use chunking for large datasets
+            if ($this->chunkSize > 0 && count($this->ids) > $this->chunkSize) {
+                $chunks = array_chunk($this->ids, $this->chunkSize);
+                foreach ($chunks as $chunk) {
+                    $totalUpdated += $instance->newQuery()
+                        ->whereIn($instance->getKeyName(), $chunk)
+                        ->update($preparedData);
+                }
+            } else {
+                $totalUpdated = $instance->newQuery()
+                    ->whereIn($instance->getKeyName(), $this->ids)
+                    ->update($preparedData);
+            }
+
+            $this->dispatchAfterEvent($this->ids, $totalUpdated);
+            return $this->afterHandle($totalUpdated);
+        };
+
+        return $this->useTransaction ? DB::transaction($execute) : $execute();
     }
 
     /**
@@ -73,6 +117,65 @@ abstract class BulkUpdateAction extends Action
     protected function prepareData(array $data): array
     {
         return $data;
+    }
+
+    /**
+     * Called before the action executes.
+     *
+     * @param array $ids The IDs being updated
+     * @param array $data The prepared data
+     */
+    protected function beforeHandle(array $ids, array $data): void
+    {
+        // Override in subclass for pre-update logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-update logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event before bulk update.
+     *
+     * @param array $ids
+     * @param array $data
+     */
+    protected function dispatchBeforeEvent(array $ids, array $data): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.bulk-updating', [$ids, $data, $this]);
+        }
+    }
+
+    /**
+     * Dispatch event after bulk update.
+     *
+     * @param array $ids
+     * @param int $count
+     */
+    protected function dispatchAfterEvent(array $ids, int $count): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.bulk-updated', [$ids, $count, $this]);
+        }
+    }
+
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
+        return true;
     }
 
     /**

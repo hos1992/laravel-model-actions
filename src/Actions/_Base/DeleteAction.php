@@ -5,6 +5,7 @@ namespace HosnyAdeeb\ModelActions\Actions\_Base;
 use HosnyAdeeb\ModelActions\Actions\Action;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 abstract class DeleteAction extends Action
 {
@@ -15,12 +16,16 @@ abstract class DeleteAction extends Action
      * @param string $selectKey The column to select by
      * @param string|null $selectValue The value to match
      * @param string $selectOperator The comparison operator
+     * @param bool $forceDelete Whether to force delete (permanently)
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private ?Model  $model,
         private string  $selectKey = 'id',
         private ?string $selectValue = null,
         private string  $selectOperator = '=',
+        private bool    $forceDelete = false,
+        private bool    $useTransaction = false,
     ) {}
 
     /**
@@ -35,14 +40,82 @@ abstract class DeleteAction extends Action
             throw new Exception('There is no model instance passed to the action!');
         }
 
-        $row = $this->model->where($this->selectKey, $this->selectOperator, $this->selectValue)->first();
+        $execute = function () {
+            $row = $this->model->where($this->selectKey, $this->selectOperator, $this->selectValue)->first();
 
-        if (!$row) {
-            throw new Exception('No record found for the given key!');
+            if (!$row) {
+                throw new Exception('No record found for the given key!');
+            }
+
+            $this->beforeHandle($row);
+            $this->dispatchBeforeEvent($row);
+
+            if ($this->forceDelete && method_exists($row, 'forceDelete')) {
+                $row->forceDelete();
+            } else {
+                $row->delete();
+            }
+
+            $this->dispatchAfterEvent($row);
+            return $this->afterHandle(true);
+        };
+
+        return $this->useTransaction ? DB::transaction($execute) : $execute();
+    }
+
+    /**
+     * Called before the action executes.
+     *
+     * @param Model $model The model being deleted
+     */
+    protected function beforeHandle(Model $model): void
+    {
+        // Override in subclass for pre-delete logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-delete logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event before delete.
+     *
+     * @param Model $model
+     */
+    protected function dispatchBeforeEvent(Model $model): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.deleting', [$model, $this]);
         }
+    }
 
-        $row->delete();
+    /**
+     * Dispatch event after delete.
+     *
+     * @param Model $model
+     */
+    protected function dispatchAfterEvent(Model $model): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.deleted', [$model, $this]);
+        }
+    }
 
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
         return true;
     }
 
