@@ -26,8 +26,8 @@ final class {{ actionClass }} extends IndexAction
     public function __construct(
         protected ?int    $perPage = null,
         protected bool    $getAll = false,
-        protected ?string $orderKey = null,
-        protected ?string $orderDir = null,
+        protected ?string $orderKey = 'id',
+        protected ?string $orderDir = 'DESC',
         protected array   $select = [],
         protected array   $with = [],
         protected array   $withOut = [],
