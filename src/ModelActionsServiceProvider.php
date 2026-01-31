@@ -41,11 +41,6 @@ class ModelActionsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../stubs' => base_path('stubs/model-actions'),
             ], 'model-actions-stubs');
-
-            // Publish base action classes
-            $this->publishes([
-                __DIR__ . '/Actions' => app_path('Actions'),
-            ], 'model-actions-base');
         }
     }
 }
