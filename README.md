@@ -35,15 +35,18 @@ php artisan vendor:publish --tag=model-actions-config
 
 ### Publish Stubs for Customization
 
+This allows you to customize the generated action classes, including the Base classes.
+
 ```bash
 php artisan vendor:publish --tag=model-actions-stubs
 ```
 
-### Publish Base Action Classes
+Once published, you can edit the files in `stubs/model-actions/`. The command will automatically use these custom stubs when generating new actions.
 
-```bash
-php artisan vendor:publish --tag=model-actions-base
-```
+Example:
+
+- `stubs/model-actions/Index.stub` -> Customizes `UserIndexAction`
+- `stubs/model-actions/base/IndexAction.stub` -> Customizes `App\Actions\_Base\IndexAction`
 
 ## Usage
 
