@@ -15,8 +15,8 @@ final class {{ actionClass }} extends StoreAction
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        private array $data,
-        private bool  $useTransaction = false,
+        protected array $data,
+        protected bool  $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
