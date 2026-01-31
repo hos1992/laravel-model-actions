@@ -226,40 +226,19 @@ class MakeActionsCommand extends Command
      */
     protected function getStub(string $type): string
     {
-        // Check for published/custom stubs first
-        $customStubPath = base_path("stubs/model-actions/{$type}.stub");
-
-        if ($this->files->exists($customStubPath)) {
-            return $this->files->get($customStubPath);
-        }
-
-        // Fall back to package stubs
-        $packageStubPath = __DIR__ . "/../../../stubs/{$type}.stub";
-
-        if ($this->files->exists($packageStubPath)) {
-            return $this->files->get($packageStubPath);
-        }
-
-        // Generate inline if stub doesn't exist
-        return $this->getInlineStub($type);
+        return $this->getActionStub($type);
     }
 
     /**
-     * Get inline stub content for action types.
+     * Resolve the potentially published stub path.
      */
-    protected function getInlineStub(string $type): string
+    protected function resolveStubPath(string $stub): string
     {
-        $stubs = [
-            'Index' => $this->getIndexStub(),
-            'Show' => $this->getShowStub(),
-            'Store' => $this->getStoreStub(),
-            'Update' => $this->getUpdateStub(),
-            'Delete' => $this->getDeleteStub(),
-            'BulkDelete' => $this->getBulkDeleteStub(),
-            'BulkUpdate' => $this->getBulkUpdateStub(),
-        ];
+        $customPath = base_path("stubs/model-actions/{$stub}");
 
-        return $stubs[$type] ?? '';
+        return file_exists($customPath)
+            ? $customPath
+            : __DIR__ . "/../../../stubs/{$stub}";
     }
 
     /**
@@ -267,7 +246,7 @@ class MakeActionsCommand extends Command
      */
     protected function getBaseActionStub(): string
     {
-        $stubPath = __DIR__ . "/../../../stubs/base/Action.stub";
+        $stubPath = $this->resolveStubPath('base/Action.stub');
 
         if (!$this->files->exists($stubPath)) {
             return '';
@@ -287,7 +266,7 @@ class MakeActionsCommand extends Command
      */
     protected function getBaseActionTypeStub(string $type): string
     {
-        $stubPath = __DIR__ . "/../../../stubs/base/{$type}Action.stub";
+        $stubPath = $this->resolveStubPath("base/{$type}Action.stub");
 
         if (!$this->files->exists($stubPath)) {
             return '';
@@ -307,7 +286,7 @@ class MakeActionsCommand extends Command
      */
     protected function getActionStub(string $type): string
     {
-        $stubPath = __DIR__ . "/../../../stubs/{$type}.stub";
+        $stubPath = $this->resolveStubPath("{$type}.stub");
 
         if (!$this->files->exists($stubPath)) {
             return '';
