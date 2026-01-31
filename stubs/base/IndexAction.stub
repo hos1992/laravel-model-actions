@@ -20,6 +20,8 @@ abstract class IndexAction extends Action
     private array $with = [];
     private array $withOut = [];
     private array $where = [];
+    private ?string $searchTerm = null;
+    private array $searchColumns = [];
 
     /**
      * Create a new IndexAction instance.
@@ -33,6 +35,8 @@ abstract class IndexAction extends Action
      * @param array|null $with Relations to eager load
      * @param array|null $withOut Relations to exclude
      * @param array|null $where Where conditions
+     * @param string|null $searchTerm Search term to filter records
+     * @param array|null $searchColumns Columns to search in
      */
     public function __construct(
         ?Model  $model,
@@ -44,6 +48,8 @@ abstract class IndexAction extends Action
         ?array  $with = null,
         ?array  $withOut = null,
         ?array  $where = null,
+        ?string $searchTerm = null,
+        ?array  $searchColumns = null,
     ) {
         $this->model = $model;
         $this->perPage = $perPage ?? $this->getPaginationPerPageDefaultCount();
@@ -69,6 +75,12 @@ abstract class IndexAction extends Action
         if ($where !== null && count($where)) {
             $this->where = $where;
         }
+        if ($searchTerm !== null) {
+            $this->searchTerm = $searchTerm;
+        }
+        if ($searchColumns !== null && count($searchColumns)) {
+            $this->searchColumns = $searchColumns;
+        }
     }
 
     /**
@@ -77,11 +89,13 @@ abstract class IndexAction extends Action
      * @return LengthAwarePaginator|Collection|array
      * @throws Exception
      */
-    public function __invoke(): Collection|LengthAwarePaginator|array
+    public function handle(): Collection|LengthAwarePaginator|array
     {
         if (!$this->model instanceof Model) {
             throw new Exception('There is no model instance passed to the action!');
         }
+
+        $this->beforeHandle();
 
         $query = $this->model->query();
 
@@ -101,11 +115,38 @@ abstract class IndexAction extends Action
             $query->withOut($this->withOut);
         }
 
+        // Apply search functionality
+        $this->applySearch($query);
+
         $this->customBuilder($query);
 
         $query->orderBy($this->orderKey, $this->orderDir);
 
-        return $this->getAll ? $query->get() : $query->paginate($this->perPage)->withQueryString();
+        $result = $this->getAll ? $query->get() : $query->paginate($this->perPage)->withQueryString();
+
+        $this->dispatchEvent($result);
+
+        return $this->afterHandle($result);
+    }
+
+    /**
+     * Apply search term to query.
+     *
+     * @param Builder $query
+     */
+    protected function applySearch(Builder $query): void
+    {
+        if ($this->searchTerm && count($this->searchColumns)) {
+            $query->where(function (Builder $q) {
+                foreach ($this->searchColumns as $index => $column) {
+                    if ($index === 0) {
+                        $q->where($column, 'LIKE', "%{$this->searchTerm}%");
+                    } else {
+                        $q->orWhere($column, 'LIKE', "%{$this->searchTerm}%");
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -117,6 +158,48 @@ abstract class IndexAction extends Action
     protected function customBuilder(Builder $builder): void
     {
         // Override in subclass for custom query logic
+    }
+
+    /**
+     * Called before the action executes.
+     */
+    protected function beforeHandle(): void
+    {
+        // Override in subclass for pre-index logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-index logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event after retrieval.
+     *
+     * @param Collection|LengthAwarePaginator $result
+     */
+    protected function dispatchEvent(Collection|LengthAwarePaginator $result): void
+    {
+        if ($this->shouldDispatchEvents()) {
+            event('model-actions.indexed', [$result, $this]);
+        }
+    }
+
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
+        return true;
     }
 
     /**

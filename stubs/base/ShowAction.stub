@@ -6,6 +6,7 @@ use App\Actions\Action;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 abstract class ShowAction extends Action
 {
@@ -21,6 +22,7 @@ abstract class ShowAction extends Action
      * @param array $withOut Relations to exclude
      * @param string $orderKey Column to order by
      * @param string $orderDir Order direction
+     * @param bool $failIfNotFound Whether to throw exception if not found
      */
     public function __construct(
         private ?Model  $model,
@@ -32,20 +34,23 @@ abstract class ShowAction extends Action
         private array   $withOut = [],
         private string  $orderKey = 'id',
         private string  $orderDir = 'DESC',
-    ) {
-    }
+        private bool    $failIfNotFound = false,
+    ) {}
 
     /**
      * Execute the show action.
      *
      * @return Model|Builder|null
      * @throws Exception
+     * @throws ModelNotFoundException
      */
-    public function __invoke(): Model|Builder|null
+    public function handle(): Model|Builder|null
     {
         if (!$this->model instanceof Model) {
             throw new Exception('There is no model instance passed to the action!');
         }
+
+        $this->beforeHandle();
 
         $query = $this->model->query();
         $query->where($this->selectKey, $this->selectOperator, $this->selectValue);
@@ -62,8 +67,77 @@ abstract class ShowAction extends Action
             $query->withOut($this->withOut);
         }
 
+        $this->customBuilder($query);
+
         $query->orderBy($this->orderKey, $this->orderDir);
 
-        return $query->first();
+        $result = $this->failIfNotFound ? $query->firstOrFail() : $query->first();
+
+        $this->dispatchEvent($result);
+
+        return $this->afterHandle($result);
+    }
+
+    /**
+     * Custom query builder method for subclasses to override.
+     *
+     * @param Builder $builder
+     * @return void
+     */
+    protected function customBuilder(Builder $builder): void
+    {
+        // Override in subclass for custom query logic
+    }
+
+    /**
+     * Called before the action executes.
+     */
+    protected function beforeHandle(): void
+    {
+        // Override in subclass for pre-show logic
+    }
+
+    /**
+     * Called after the action executes.
+     *
+     * @param mixed $result
+     * @return mixed
+     */
+    protected function afterHandle(mixed $result): mixed
+    {
+        // Override in subclass for post-show logic
+        return $result;
+    }
+
+    /**
+     * Dispatch event after retrieval.
+     *
+     * @param Model|null $model
+     */
+    protected function dispatchEvent(?Model $model): void
+    {
+        if ($this->shouldDispatchEvents() && $model) {
+            event('model-actions.retrieved', [$model, $this]);
+        }
+    }
+
+    /**
+     * Determine if events should be dispatched.
+     *
+     * @return bool
+     */
+    protected function shouldDispatchEvents(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the model instance.
+     *
+     * @return Model|null
+     */
+    protected function getModel(): ?Model
+    {
+        return $this->model;
     }
 }

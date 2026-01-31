@@ -24,20 +24,43 @@ final class {{ class }} extends Action
         return null;
     }
 
-    /**
-     * Called before the action executes.
-     */
-    protected function before(): void
-    {
-        // Pre-execution logic
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Available Lifecycle Hooks
+    |--------------------------------------------------------------------------
+    |
+    | The following methods are provided by the HasHooks trait.
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
 
-    /**
-     * Called after the action executes.
-     */
-    protected function after(mixed $result): mixed
-    {
-        // Post-execution logic
-        return $result;
-    }
+    // /**
+    //  * Called before the action executes.
+    //  */
+    // protected function before(): void
+    // {
+    //     // Pre-execution logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result The result from handle()
+    //  * @return mixed The potentially modified result
+    //  */
+    // protected function after(mixed $result): mixed
+    // {
+    //     // Post-execution logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Called when the action fails with an exception.
+    //  *
+    //  * @param \Throwable $exception
+    //  */
+    // protected function onError(\Throwable $exception): void
+    // {
+    //     // Error handling logic
+    // }
 }

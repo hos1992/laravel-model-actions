@@ -340,6 +340,7 @@ PHP;
 namespace {{ namespace }};
 
 use App\Actions\_Base\IndexAction;
+use Illuminate\Database\Eloquent\Builder;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends IndexAction
@@ -396,6 +397,49 @@ final class {{ actionClass }} extends IndexAction
     {
         return $this->request;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Custom query builder - add custom query conditions.
+    //  */
+    // protected function customBuilder(Builder $builder): void
+    // {
+    //     // Example: $builder->where('is_active', true);
+    // }
+
+    // /**
+    //  * Called before the action executes.
+    //  */
+    // protected function beforeHandle(): void
+    // {
+    //     // Pre-index logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-index logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.indexed'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -411,6 +455,7 @@ STUB;
 namespace {{ namespace }};
 
 use App\Actions\_Base\ShowAction;
+use Illuminate\Database\Eloquent\Builder;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends ShowAction
@@ -452,6 +497,49 @@ final class {{ actionClass }} extends ShowAction
             failIfNotFound: $this->failIfNotFound,
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Custom query builder - add custom query conditions.
+    //  */
+    // protected function customBuilder(Builder $builder): void
+    // {
+    //     // Example: $builder->where('is_active', true);
+    // }
+
+    // /**
+    //  * Called before the action executes.
+    //  */
+    // protected function beforeHandle(): void
+    // {
+    //     // Pre-show logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-show logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.retrieved'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -467,6 +555,7 @@ STUB;
 namespace {{ namespace }};
 
 use App\Actions\_Base\StoreAction;
+use Illuminate\Database\Eloquent\Model;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends StoreAction
@@ -496,6 +585,45 @@ final class {{ actionClass }} extends StoreAction
         // Add any data transformations here
         return $data;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param array $data The prepared data
+    //  */
+    // protected function beforeHandle(array $data): void
+    // {
+    //     // Pre-store logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result The created model
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-store logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.creating', 'model-actions.created'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -511,6 +639,7 @@ STUB;
 namespace {{ namespace }};
 
 use App\Actions\_Base\UpdateAction;
+use Illuminate\Database\Eloquent\Model;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends UpdateAction
@@ -549,6 +678,46 @@ final class {{ actionClass }} extends UpdateAction
         // Add any data transformations here
         return $data;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param Model $model The model being updated
+    //  * @param array $data The prepared data
+    //  */
+    // protected function beforeHandle(Model $model, array $data): void
+    // {
+    //     // Pre-update logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result The updated model
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-update logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.updating', 'model-actions.updated'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -564,6 +733,7 @@ STUB;
 namespace {{ namespace }};
 
 use App\Actions\_Base\DeleteAction;
+use Illuminate\Database\Eloquent\Model;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends DeleteAction
@@ -593,6 +763,45 @@ final class {{ actionClass }} extends DeleteAction
             useTransaction: $this->useTransaction,
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param Model $model The model being deleted
+    //  */
+    // protected function beforeHandle(Model $model): void
+    // {
+    //     // Pre-delete logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result Returns true on success
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-delete logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.deleting', 'model-actions.deleted'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -607,22 +816,24 @@ STUB;
 
 namespace {{ namespace }};
 
-use HosnyAdeeb\ModelActions\Actions\_Base\BulkDeleteAction as BaseBulkDeleteAction;
+use App\Actions\_Base\BulkDeleteAction;
 use {{ modelPath }}\{{ model }};
 
-final class {{ actionClass }} extends BaseBulkDeleteAction
+final class {{ actionClass }} extends BulkDeleteAction
 {
     /**
      * Create a new {{ actionClass }} instance.
      *
      * @param array $ids The IDs of records to delete
      * @param bool $forceDelete Whether to force delete (permanently)
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         array $ids = [],
-        bool $forceDelete = false
+        bool $forceDelete = false,
+        bool $useTransaction = false
     ) {
-        parent::__construct($ids, $forceDelete);
+        parent::__construct($ids, $forceDelete, $useTransaction);
     }
 
     /**
@@ -632,6 +843,45 @@ final class {{ actionClass }} extends BaseBulkDeleteAction
     {
         return {{ model }}::class;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param array $ids The IDs being deleted
+    //  */
+    // protected function beforeHandle(array $ids): void
+    // {
+    //     // Pre-bulk-delete logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result The count of deleted records
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-bulk-delete logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.bulk-deleting', 'model-actions.bulk-deleted'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
@@ -646,22 +896,26 @@ STUB;
 
 namespace {{ namespace }};
 
-use HosnyAdeeb\ModelActions\Actions\_Base\BulkUpdateAction as BaseBulkUpdateAction;
+use App\Actions\_Base\BulkUpdateAction;
 use {{ modelPath }}\{{ model }};
 
-final class {{ actionClass }} extends BaseBulkUpdateAction
+final class {{ actionClass }} extends BulkUpdateAction
 {
     /**
      * Create a new {{ actionClass }} instance.
      *
      * @param array $ids The IDs of records to update
      * @param array $data The data to update
+     * @param bool $useTransaction Whether to wrap in a database transaction
+     * @param int $chunkSize Chunk size for large datasets (0 = no chunking)
      */
     public function __construct(
         array $ids = [],
-        array $data = []
+        array $data = [],
+        bool $useTransaction = false,
+        int $chunkSize = 0
     ) {
-        parent::__construct($ids, $data);
+        parent::__construct($ids, $data, $useTransaction, $chunkSize);
     }
 
     /**
@@ -680,6 +934,46 @@ final class {{ actionClass }} extends BaseBulkUpdateAction
         // Add any data transformations here
         return $data;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param array $ids The IDs being updated
+    //  * @param array $data The prepared data
+    //  */
+    // protected function beforeHandle(array $ids, array $data): void
+    // {
+    //     // Pre-bulk-update logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result The count of updated records
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-bulk-update logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.bulk-updating', 'model-actions.bulk-updated'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
 STUB;
     }
