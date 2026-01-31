@@ -114,7 +114,7 @@ abstract class StoreAction extends Action
      */
     protected function shouldDispatchEvents(): bool
     {
-        return true;
+        return false;
     }
 
     /**

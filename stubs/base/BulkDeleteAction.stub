@@ -142,7 +142,7 @@ abstract class BulkDeleteAction extends Action
      */
     protected function shouldDispatchEvents(): bool
     {
-        return true;
+        return false;
     }
 
     /**

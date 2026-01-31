@@ -128,7 +128,7 @@ abstract class ShowAction extends Action
      */
     protected function shouldDispatchEvents(): bool
     {
-        return true;
+        return false;
     }
 
     /**

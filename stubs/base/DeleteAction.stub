@@ -116,7 +116,7 @@ abstract class DeleteAction extends Action
      */
     protected function shouldDispatchEvents(): bool
     {
-        return true;
+        return false;
     }
 
     /**
