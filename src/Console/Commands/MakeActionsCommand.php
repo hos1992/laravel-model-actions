@@ -263,70 +263,53 @@ class MakeActionsCommand extends Command
      */
     protected function getBaseActionStub(): string
     {
-        $namespace = config('model-actions.actions_namespace', 'App\\Actions');
+        $stubPath = __DIR__ . "/../../../stubs/base/Action.stub";
 
-        return <<<PHP
-<?php
+        if (!$this->files->exists($stubPath)) {
+            return '';
+        }
 
-namespace {$namespace};
+        $content = $this->files->get($stubPath);
 
-use HosnyAdeeb\ModelActions\Traits\Runnable;
-
-abstract class Action
-{
-    use Runnable;
-
-    /**
-     * Execute the action.
-     *
-     * @return mixed
-     */
-    abstract public function __invoke(): mixed;
-}
-PHP;
+        return str_replace(
+            '{{ namespace }}',
+            config('model-actions.actions_namespace', 'App\\Actions'),
+            $content
+        );
     }
 
     /**
-     * Get base action type stub path.
-     */
-    protected function getBaseActionTypeStubPath(string $type): string
-    {
-        return __DIR__ . "/../../../stubs/base/{$type}Action.stub";
-    }
-
-    /**
-     * Get base action type stub content.
+     * Get base action type stub content from stubs directory.
      */
     protected function getBaseActionTypeStub(string $type): string
     {
-        $stubPath = $this->getBaseActionTypeStubPath($type);
+        $stubPath = __DIR__ . "/../../../stubs/base/{$type}Action.stub";
 
-        if ($this->files->exists($stubPath)) {
-            $content = $this->files->get($stubPath);
-            return str_replace(
-                '{{ namespace }}',
-                config('model-actions.actions_namespace', 'App\\Actions') . '\\_Base',
-                $content
-            );
+        if (!$this->files->exists($stubPath)) {
+            return '';
         }
 
-        // Use package base actions as fallback
-        $packagePath = __DIR__ . "/../../Actions/_Base/{$type}Action.php";
-        if ($this->files->exists($packagePath)) {
-            $content = $this->files->get($packagePath);
-            // Replace package namespace with app namespace
-            return str_replace(
-                'HosnyAdeeb\\ModelActions\\Actions\\_Base',
-                config('model-actions.actions_namespace', 'App\\Actions') . '\\_Base',
-                str_replace(
-                    'HosnyAdeeb\\ModelActions\\Actions\\Action',
-                    config('model-actions.actions_namespace', 'App\\Actions') . '\\Action',
-                    $content
-                )
-            );
+        $content = $this->files->get($stubPath);
+
+        return str_replace(
+            '{{ namespace }}',
+            config('model-actions.actions_namespace', 'App\\Actions') . '\\_Base',
+            $content
+        );
+    }
+
+    /**
+     * Get action stub content from stubs directory.
+     */
+    protected function getActionStub(string $type): string
+    {
+        $stubPath = __DIR__ . "/../../../stubs/{$type}.stub";
+
+        if (!$this->files->exists($stubPath)) {
+            return '';
         }
 
-        return '';
+        return $this->files->get($stubPath);
     }
 
     /**
@@ -334,114 +317,7 @@ PHP;
      */
     protected function getIndexStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\IndexAction;
-use Illuminate\Database\Eloquent\Builder;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends IndexAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param int|null $perPage Number of items per page
-     * @param bool $getAll Whether to get all records
-     * @param string|null $orderKey Column to order by
-     * @param string|null $orderDir Order direction (ASC/DESC)
-     * @param array $select Columns to select
-     * @param array $with Relations to eager load
-     * @param array $withOut Relations to exclude
-     * @param array $where Where conditions
-     * @param string|null $searchTerm Search term to filter records
-     * @param array $searchColumns Columns to search in
-     * @param array $request Additional request data for custom queries
-     */
-    public function __construct(
-        private ?int    $perPage = null,
-        private bool    $getAll = false,
-        private ?string $orderKey = null,
-        private ?string $orderDir = null,
-        private array   $select = [],
-        private array   $with = [],
-        private array   $withOut = [],
-        private array   $where = [],
-        private ?string $searchTerm = null,
-        private array   $searchColumns = [],
-        private array   $request = [],
-    ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            perPage: $this->perPage,
-            getAll: $this->getAll,
-            orderKey: $this->orderKey,
-            orderDir: $this->orderDir,
-            select: $this->select,
-            with: $this->with,
-            withOut: $this->withOut,
-            where: $this->where,
-            searchTerm: $this->searchTerm,
-            searchColumns: $this->searchColumns,
-        );
-    }
-
-    /**
-     * Get the request data.
-     *
-     * @return array
-     */
-    protected function getRequest(): array
-    {
-        return $this->request;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Custom query builder - add custom query conditions.
-    //  */
-    // protected function customBuilder(Builder $builder): void
-    // {
-    //     // Example: $builder->where('is_active', true);
-    // }
-
-    // /**
-    //  * Called before the action executes.
-    //  */
-    // protected function beforeHandle(): void
-    // {
-    //     // Pre-index logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-index logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.indexed'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('Index');
     }
 
     /**
@@ -449,99 +325,7 @@ STUB;
      */
     protected function getShowStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\ShowAction;
-use Illuminate\Database\Eloquent\Builder;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends ShowAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param string $selectKey Column to select by
-     * @param string|null $selectValue Value to match
-     * @param string $selectOperator Comparison operator
-     * @param array $select Columns to select
-     * @param array $with Relations to eager load
-     * @param array $withOut Relations to exclude
-     * @param string $orderKey Column to order by
-     * @param string $orderDir Order direction
-     * @param bool $failIfNotFound Whether to throw exception if not found
-     */
-    public function __construct(
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private array   $select = [],
-        private array   $with = [],
-        private array   $withOut = [],
-        private string  $orderKey = 'id',
-        private string  $orderDir = 'DESC',
-        private bool    $failIfNotFound = false,
-    ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            selectKey: $this->selectKey,
-            selectValue: $this->selectValue,
-            selectOperator: $this->selectOperator,
-            select: $this->select,
-            with: $this->with,
-            withOut: $this->withOut,
-            orderKey: $this->orderKey,
-            orderDir: $this->orderDir,
-            failIfNotFound: $this->failIfNotFound,
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Custom query builder - add custom query conditions.
-    //  */
-    // protected function customBuilder(Builder $builder): void
-    // {
-    //     // Example: $builder->where('is_active', true);
-    // }
-
-    // /**
-    //  * Called before the action executes.
-    //  */
-    // protected function beforeHandle(): void
-    // {
-    //     // Pre-show logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-show logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.retrieved'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('Show');
     }
 
     /**
@@ -549,83 +333,7 @@ STUB;
      */
     protected function getStoreStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\StoreAction;
-use Illuminate\Database\Eloquent\Model;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends StoreAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param array $data The data to store
-     * @param bool $useTransaction Whether to wrap in a database transaction
-     */
-    public function __construct(
-        private array $data,
-        private bool  $useTransaction = false,
-    ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            data: $this->data,
-            useTransaction: $this->useTransaction,
-        );
-    }
-
-    /**
-     * Prepare the data before storing.
-     */
-    protected function prepareData(array $data): array
-    {
-        // Add any data transformations here
-        return $data;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Called before the action executes.
-    //  *
-    //  * @param array $data The prepared data
-    //  */
-    // protected function beforeHandle(array $data): void
-    // {
-    //     // Pre-store logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  *
-    //  * @param mixed $result The created model
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-store logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.creating', 'model-actions.created'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('Store');
     }
 
     /**
@@ -633,93 +341,7 @@ STUB;
      */
     protected function getUpdateStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\UpdateAction;
-use Illuminate\Database\Eloquent\Model;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends UpdateAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param array $data The data to update
-     * @param string $selectKey Column to select by
-     * @param string|null $selectValue Value to match
-     * @param string $selectOperator Comparison operator
-     * @param bool $useTransaction Whether to wrap in a database transaction
-     */
-    public function __construct(
-        private array   $data,
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private bool    $useTransaction = false,
-    ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            data: $this->data,
-            selectKey: $this->selectKey,
-            selectValue: $this->selectValue,
-            selectOperator: $this->selectOperator,
-            useTransaction: $this->useTransaction,
-        );
-    }
-
-    /**
-     * Prepare the data before updating.
-     */
-    protected function prepareData(array $data): array
-    {
-        // Add any data transformations here
-        return $data;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Called before the action executes.
-    //  *
-    //  * @param Model $model The model being updated
-    //  * @param array $data The prepared data
-    //  */
-    // protected function beforeHandle(Model $model, array $data): void
-    // {
-    //     // Pre-update logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  *
-    //  * @param mixed $result The updated model
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-update logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.updating', 'model-actions.updated'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('Update');
     }
 
     /**
@@ -727,83 +349,7 @@ STUB;
      */
     protected function getDeleteStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\DeleteAction;
-use Illuminate\Database\Eloquent\Model;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends DeleteAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param string $selectKey Column to select by
-     * @param string|null $selectValue Value to match
-     * @param string $selectOperator Comparison operator
-     * @param bool $forceDelete Whether to force delete (permanently)
-     * @param bool $useTransaction Whether to wrap in a database transaction
-     */
-    public function __construct(
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private bool    $forceDelete = false,
-        private bool    $useTransaction = false,
-    ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            selectKey: $this->selectKey,
-            selectValue: $this->selectValue,
-            selectOperator: $this->selectOperator,
-            forceDelete: $this->forceDelete,
-            useTransaction: $this->useTransaction,
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Called before the action executes.
-    //  *
-    //  * @param Model $model The model being deleted
-    //  */
-    // protected function beforeHandle(Model $model): void
-    // {
-    //     // Pre-delete logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  *
-    //  * @param mixed $result Returns true on success
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-delete logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.deleting', 'model-actions.deleted'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('Delete');
     }
 
     /**
@@ -811,79 +357,7 @@ STUB;
      */
     protected function getBulkDeleteStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\BulkDeleteAction;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends BulkDeleteAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param array $ids The IDs of records to delete
-     * @param bool $forceDelete Whether to force delete (permanently)
-     * @param bool $useTransaction Whether to wrap in a database transaction
-     */
-    public function __construct(
-        array $ids = [],
-        bool $forceDelete = false,
-        bool $useTransaction = false
-    ) {
-        parent::__construct($ids, $forceDelete, $useTransaction);
-    }
-
-    /**
-     * Get the model class.
-     */
-    protected function model(): string
-    {
-        return {{ model }}::class;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Called before the action executes.
-    //  *
-    //  * @param array $ids The IDs being deleted
-    //  */
-    // protected function beforeHandle(array $ids): void
-    // {
-    //     // Pre-bulk-delete logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  *
-    //  * @param mixed $result The count of deleted records
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-bulk-delete logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.bulk-deleting', 'model-actions.bulk-deleted'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('BulkDelete');
     }
 
     /**
@@ -891,90 +365,6 @@ STUB;
      */
     protected function getBulkUpdateStub(): string
     {
-        return <<<'STUB'
-<?php
-
-namespace {{ namespace }};
-
-use App\Actions\_Base\BulkUpdateAction;
-use {{ modelPath }}\{{ model }};
-
-final class {{ actionClass }} extends BulkUpdateAction
-{
-    /**
-     * Create a new {{ actionClass }} instance.
-     *
-     * @param array $ids The IDs of records to update
-     * @param array $data The data to update
-     * @param bool $useTransaction Whether to wrap in a database transaction
-     * @param int $chunkSize Chunk size for large datasets (0 = no chunking)
-     */
-    public function __construct(
-        array $ids = [],
-        array $data = [],
-        bool $useTransaction = false,
-        int $chunkSize = 0
-    ) {
-        parent::__construct($ids, $data, $useTransaction, $chunkSize);
-    }
-
-    /**
-     * Get the model class.
-     */
-    protected function model(): string
-    {
-        return {{ model }}::class;
-    }
-
-    /**
-     * Prepare the data before bulk update.
-     */
-    protected function prepareData(array $data): array
-    {
-        // Add any data transformations here
-        return $data;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Available Methods to Override
-    |--------------------------------------------------------------------------
-    |
-    | Uncomment and customize any of the following methods as needed.
-    |
-    */
-
-    // /**
-    //  * Called before the action executes.
-    //  *
-    //  * @param array $ids The IDs being updated
-    //  * @param array $data The prepared data
-    //  */
-    // protected function beforeHandle(array $ids, array $data): void
-    // {
-    //     // Pre-bulk-update logic
-    // }
-
-    // /**
-    //  * Called after the action executes.
-    //  *
-    //  * @param mixed $result The count of updated records
-    //  */
-    // protected function afterHandle(mixed $result): mixed
-    // {
-    //     // Post-bulk-update logic
-    //     return $result;
-    // }
-
-    // /**
-    //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.bulk-updating', 'model-actions.bulk-updated'
-    //  */
-    // protected function shouldDispatchEvents(): bool
-    // {
-    //     return true;
-    // }
-}
-STUB;
+        return $this->getActionStub('BulkUpdate');
     }
 }

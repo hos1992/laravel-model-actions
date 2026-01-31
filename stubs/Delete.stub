@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use App\Actions\_Base\DeleteAction;
+use Illuminate\Database\Eloquent\Model;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends DeleteAction
@@ -13,50 +14,62 @@ final class {{ actionClass }} extends DeleteAction
      * @param string $selectKey Column to select by
      * @param string|null $selectValue Value to match
      * @param string $selectOperator Comparison operator
+     * @param bool $forceDelete Whether to force delete (permanently)
+     * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
         private string  $selectKey = 'id',
         private ?string $selectValue = null,
         private string  $selectOperator = '=',
+        private bool    $forceDelete = false,
+        private bool    $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
             selectKey: $this->selectKey,
             selectValue: $this->selectValue,
             selectOperator: $this->selectOperator,
+            forceDelete: $this->forceDelete,
+            useTransaction: $this->useTransaction,
         );
     }
 
-    /**
-     * Customize the delete logic by overriding __invoke().
-     * Uncomment and modify as needed.
-     */
-    // public function __invoke(): mixed
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Called before the action executes.
+    //  *
+    //  * @param Model $model The model being deleted
+    //  */
+    // protected function beforeHandle(Model $model): void
     // {
-    //     // Add custom logic before deletion
-    //     // $this->beforeDelete();
-    //     
-    //     $result = parent::__invoke();
-    //     
-    //     // Add custom logic after deletion
-    //     // $this->afterDelete();
-    //     
+    //     // Pre-delete logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  *
+    //  * @param mixed $result Returns true on success
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-delete logic
     //     return $result;
     // }
 
-    /**
-     * Add custom logic before deletion.
-     */
-    // protected function beforeDelete(): void
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.deleting', 'model-actions.deleted'
+    //  */
+    // protected function shouldDispatchEvents(): bool
     // {
-    //     // Your before delete logic here
-    // }
-
-    /**
-     * Add custom logic after deletion.
-     */
-    // protected function afterDelete(): void
-    // {
-    //     // Your after delete logic here
+    //     return true;
     // }
 }

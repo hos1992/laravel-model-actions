@@ -2,40 +2,38 @@
 
 namespace {{ namespace }};
 
-use App\Actions\_Base\UpdateAction;
-use Illuminate\Database\Eloquent\Model;
+use App\Actions\_Base\BulkUpdateAction;
 use {{ modelPath }}\{{ model }};
 
-final class {{ actionClass }} extends UpdateAction
+final class {{ actionClass }} extends BulkUpdateAction
 {
     /**
      * Create a new {{ actionClass }} instance.
      *
+     * @param array $ids The IDs of records to update
      * @param array $data The data to update
-     * @param string $selectKey Column to select by
-     * @param string|null $selectValue Value to match
-     * @param string $selectOperator Comparison operator
      * @param bool $useTransaction Whether to wrap in a database transaction
+     * @param int $chunkSize Chunk size for large datasets (0 = no chunking)
      */
     public function __construct(
-        private array   $data,
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private bool    $useTransaction = false,
+        array $ids = [],
+        array $data = [],
+        bool $useTransaction = false,
+        int $chunkSize = 0
     ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            data: $this->data,
-            selectKey: $this->selectKey,
-            selectValue: $this->selectValue,
-            selectOperator: $this->selectOperator,
-            useTransaction: $this->useTransaction,
-        );
+        parent::__construct($ids, $data, $useTransaction, $chunkSize);
     }
 
     /**
-     * Prepare the data before updating.
+     * Get the model class.
+     */
+    protected function model(): string
+    {
+        return {{ model }}::class;
+    }
+
+    /**
+     * Prepare the data before bulk update.
      */
     protected function prepareData(array $data): array
     {
@@ -55,28 +53,28 @@ final class {{ actionClass }} extends UpdateAction
     // /**
     //  * Called before the action executes.
     //  *
-    //  * @param Model $model The model being updated
+    //  * @param array $ids The IDs being updated
     //  * @param array $data The prepared data
     //  */
-    // protected function beforeHandle(Model $model, array $data): void
+    // protected function beforeHandle(array $ids, array $data): void
     // {
-    //     // Pre-update logic
+    //     // Pre-bulk-update logic
     // }
 
     // /**
     //  * Called after the action executes.
     //  *
-    //  * @param mixed $result The updated model
+    //  * @param mixed $result The count of updated records
     //  */
     // protected function afterHandle(mixed $result): mixed
     // {
-    //     // Post-update logic
+    //     // Post-bulk-update logic
     //     return $result;
     // }
 
     // /**
     //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.updating', 'model-actions.updated'
+    //  * Events: 'model-actions.bulk-updating', 'model-actions.bulk-updated'
     //  */
     // protected function shouldDispatchEvents(): bool
     // {

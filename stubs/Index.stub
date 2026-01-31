@@ -3,8 +3,8 @@
 namespace {{ namespace }};
 
 use App\Actions\_Base\IndexAction;
-use {{ modelPath }}\{{ model }};
 use Illuminate\Database\Eloquent\Builder;
+use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends IndexAction
 {
@@ -19,6 +19,8 @@ final class {{ actionClass }} extends IndexAction
      * @param array $with Relations to eager load
      * @param array $withOut Relations to exclude
      * @param array $where Where conditions
+     * @param string|null $searchTerm Search term to filter records
+     * @param array $searchColumns Columns to search in
      * @param array $request Additional request data for custom queries
      */
     public function __construct(
@@ -30,6 +32,8 @@ final class {{ actionClass }} extends IndexAction
         private array   $with = [],
         private array   $withOut = [],
         private array   $where = [],
+        private ?string $searchTerm = null,
+        private array   $searchColumns = [],
         private array   $request = [],
     ) {
         parent::__construct(
@@ -42,23 +46,9 @@ final class {{ actionClass }} extends IndexAction
             with: $this->with,
             withOut: $this->withOut,
             where: $this->where,
+            searchTerm: $this->searchTerm,
+            searchColumns: $this->searchColumns,
         );
-    }
-
-    /**
-     * Add custom query logic here.
-     * This method is called by the parent class during query building.
-     *
-     * @param Builder $builder
-     * @return void
-     */
-    protected function customBuilder(Builder $builder): void
-    {
-        // Add your custom query logic here
-        // Example:
-        // if ($this->request['search'] ?? null) {
-        //     $builder->where('name', 'like', '%' . $this->request['search'] . '%');
-        // }
     }
 
     /**
@@ -70,4 +60,47 @@ final class {{ actionClass }} extends IndexAction
     {
         return $this->request;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Custom query builder - add custom query conditions.
+    //  */
+    // protected function customBuilder(Builder $builder): void
+    // {
+    //     // Example: $builder->where('is_active', true);
+    // }
+
+    // /**
+    //  * Called before the action executes.
+    //  */
+    // protected function beforeHandle(): void
+    // {
+    //     // Pre-index logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-index logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.indexed'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }

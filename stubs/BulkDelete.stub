@@ -2,36 +2,32 @@
 
 namespace {{ namespace }};
 
-use App\Actions\_Base\StoreAction;
-use Illuminate\Database\Eloquent\Model;
+use App\Actions\_Base\BulkDeleteAction;
 use {{ modelPath }}\{{ model }};
 
-final class {{ actionClass }} extends StoreAction
+final class {{ actionClass }} extends BulkDeleteAction
 {
     /**
      * Create a new {{ actionClass }} instance.
      *
-     * @param array $data The data to store
+     * @param array $ids The IDs of records to delete
+     * @param bool $forceDelete Whether to force delete (permanently)
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        private array $data,
-        private bool  $useTransaction = false,
+        array $ids = [],
+        bool $forceDelete = false,
+        bool $useTransaction = false
     ) {
-        parent::__construct(
-            model: new {{ model }}(),
-            data: $this->data,
-            useTransaction: $this->useTransaction,
-        );
+        parent::__construct($ids, $forceDelete, $useTransaction);
     }
 
     /**
-     * Prepare the data before storing.
+     * Get the model class.
      */
-    protected function prepareData(array $data): array
+    protected function model(): string
     {
-        // Add any data transformations here
-        return $data;
+        return {{ model }}::class;
     }
 
     /*
@@ -46,27 +42,27 @@ final class {{ actionClass }} extends StoreAction
     // /**
     //  * Called before the action executes.
     //  *
-    //  * @param array $data The prepared data
+    //  * @param array $ids The IDs being deleted
     //  */
-    // protected function beforeHandle(array $data): void
+    // protected function beforeHandle(array $ids): void
     // {
-    //     // Pre-store logic
+    //     // Pre-bulk-delete logic
     // }
 
     // /**
     //  * Called after the action executes.
     //  *
-    //  * @param mixed $result The created model
+    //  * @param mixed $result The count of deleted records
     //  */
     // protected function afterHandle(mixed $result): mixed
     // {
-    //     // Post-store logic
+    //     // Post-bulk-delete logic
     //     return $result;
     // }
 
     // /**
     //  * Determine if events should be dispatched.
-    //  * Events: 'model-actions.creating', 'model-actions.created'
+    //  * Events: 'model-actions.bulk-deleting', 'model-actions.bulk-deleted'
     //  */
     // protected function shouldDispatchEvents(): bool
     // {

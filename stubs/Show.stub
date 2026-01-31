@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use App\Actions\_Base\ShowAction;
+use Illuminate\Database\Eloquent\Builder;
 use {{ modelPath }}\{{ model }};
 
 final class {{ actionClass }} extends ShowAction
@@ -18,6 +19,7 @@ final class {{ actionClass }} extends ShowAction
      * @param array $withOut Relations to exclude
      * @param string $orderKey Column to order by
      * @param string $orderDir Order direction
+     * @param bool $failIfNotFound Whether to throw exception if not found
      */
     public function __construct(
         private string  $selectKey = 'id',
@@ -28,6 +30,7 @@ final class {{ actionClass }} extends ShowAction
         private array   $withOut = [],
         private string  $orderKey = 'id',
         private string  $orderDir = 'DESC',
+        private bool    $failIfNotFound = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),
@@ -39,6 +42,50 @@ final class {{ actionClass }} extends ShowAction
             withOut: $this->withOut,
             orderKey: $this->orderKey,
             orderDir: $this->orderDir,
+            failIfNotFound: $this->failIfNotFound,
         );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Available Methods to Override
+    |--------------------------------------------------------------------------
+    |
+    | Uncomment and customize any of the following methods as needed.
+    |
+    */
+
+    // /**
+    //  * Custom query builder - add custom query conditions.
+    //  */
+    // protected function customBuilder(Builder $builder): void
+    // {
+    //     // Example: $builder->where('is_active', true);
+    // }
+
+    // /**
+    //  * Called before the action executes.
+    //  */
+    // protected function beforeHandle(): void
+    // {
+    //     // Pre-show logic
+    // }
+
+    // /**
+    //  * Called after the action executes.
+    //  */
+    // protected function afterHandle(mixed $result): mixed
+    // {
+    //     // Post-show logic
+    //     return $result;
+    // }
+
+    // /**
+    //  * Determine if events should be dispatched.
+    //  * Events: 'model-actions.retrieved'
+    //  */
+    // protected function shouldDispatchEvents(): bool
+    // {
+    //     return true;
+    // }
 }
