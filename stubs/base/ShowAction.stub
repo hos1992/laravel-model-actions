@@ -25,16 +25,16 @@ abstract class ShowAction extends Action
      * @param bool $failIfNotFound Whether to throw exception if not found
      */
     public function __construct(
-        private ?Model  $model,
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private array   $select = [],
-        private array   $with = [],
-        private array   $withOut = [],
-        private string  $orderKey = 'id',
-        private string  $orderDir = 'DESC',
-        private bool    $failIfNotFound = false,
+        protected ?Model  $model,
+        protected string  $selectKey = 'id',
+        protected ?string $selectValue = null,
+        protected string  $selectOperator = '=',
+        protected array   $select = [],
+        protected array   $with = [],
+        protected array   $withOut = [],
+        protected string  $orderKey = 'id',
+        protected string  $orderDir = 'DESC',
+        protected bool    $failIfNotFound = false,
     ) {}
 
     /**
@@ -49,8 +49,6 @@ abstract class ShowAction extends Action
         if (!$this->model instanceof Model) {
             throw new Exception('There is no model instance passed to the action!');
         }
-
-        $this->beforeHandle();
 
         $query = $this->model->query();
         $query->where($this->selectKey, $this->selectOperator, $this->selectValue);
@@ -75,7 +73,7 @@ abstract class ShowAction extends Action
 
         $this->dispatchEvent($result);
 
-        return $this->afterHandle($result);
+        return $result;
     }
 
     /**
@@ -89,25 +87,7 @@ abstract class ShowAction extends Action
         // Override in subclass for custom query logic
     }
 
-    /**
-     * Called before the action executes.
-     */
-    protected function beforeHandle(): void
-    {
-        // Override in subclass for pre-show logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-show logic
-        return $result;
-    }
 
     /**
      * Dispatch event after retrieval.

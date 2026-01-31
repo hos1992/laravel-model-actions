@@ -52,11 +52,8 @@ final class {{ actionClass }} extends BulkUpdateAction
 
     // /**
     //  * Called before the action executes.
-    //  *
-    //  * @param array $ids The IDs being updated
-    //  * @param array $data The prepared data
     //  */
-    // protected function beforeHandle(array $ids, array $data): void
+    // protected function before(): void
     // {
     //     // Pre-bulk-update logic
     // }
@@ -66,7 +63,7 @@ final class {{ actionClass }} extends BulkUpdateAction
     //  *
     //  * @param mixed $result The count of updated records
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-bulk-update logic
     //     return $result;

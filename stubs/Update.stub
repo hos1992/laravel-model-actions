@@ -54,11 +54,8 @@ final class {{ actionClass }} extends UpdateAction
 
     // /**
     //  * Called before the action executes.
-    //  *
-    //  * @param Model $model The model being updated
-    //  * @param array $data The prepared data
     //  */
-    // protected function beforeHandle(Model $model, array $data): void
+    // protected function before(): void
     // {
     //     // Pre-update logic
     // }
@@ -68,7 +65,7 @@ final class {{ actionClass }} extends UpdateAction
     //  *
     //  * @param mixed $result The updated model
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-update logic
     //     return $result;

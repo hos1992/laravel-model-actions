@@ -70,7 +70,6 @@ abstract class BulkDeleteAction extends Action
             /** @var Model $instance */
             $instance = new $modelClass();
 
-            $this->beforeHandle($this->ids);
             $this->dispatchBeforeEvent($this->ids);
 
             $query = $instance->newQuery()->whereIn($instance->getKeyName(), $this->ids);
@@ -88,27 +87,7 @@ abstract class BulkDeleteAction extends Action
         return $this->useTransaction ? DB::transaction($execute) : $execute();
     }
 
-    /**
-     * Called before the action executes.
-     *
-     * @param array $ids The IDs being deleted
-     */
-    protected function beforeHandle(array $ids): void
-    {
-        // Override in subclass for pre-delete logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-delete logic
-        return $result;
-    }
 
     /**
      * Dispatch event before bulk delete.

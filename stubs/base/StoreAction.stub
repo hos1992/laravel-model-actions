@@ -17,9 +17,9 @@ abstract class StoreAction extends Action
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        private ?Model $model,
-        private array  $data,
-        private bool   $useTransaction = false,
+        protected ?Model $model,
+        protected array  $data,
+        protected bool   $useTransaction = false,
     ) {}
 
     /**
@@ -37,13 +37,12 @@ abstract class StoreAction extends Action
         $execute = function () {
             $preparedData = $this->prepareData($this->data);
 
-            $this->beforeHandle($preparedData);
             $this->dispatchBeforeEvent($preparedData);
 
             $created = $this->model->create($preparedData);
 
             $this->dispatchAfterEvent($created);
-            return $this->afterHandle($created);
+            return $created;
         };
 
         return $this->useTransaction ? DB::transaction($execute) : $execute();
@@ -61,27 +60,7 @@ abstract class StoreAction extends Action
         return $data;
     }
 
-    /**
-     * Called before the action executes.
-     *
-     * @param array $data The prepared data
-     */
-    protected function beforeHandle(array $data): void
-    {
-        // Override in subclass for pre-store logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-store logic
-        return $result;
-    }
 
     /**
      * Dispatch event before store.

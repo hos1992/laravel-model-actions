@@ -20,12 +20,12 @@ abstract class UpdateAction extends Action
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        private ?Model  $model,
-        private array   $data,
-        private string  $selectKey = 'id',
-        private ?string $selectValue = null,
-        private string  $selectOperator = '=',
-        private bool    $useTransaction = false,
+        protected ?Model  $model,
+        protected array   $data,
+        protected string  $selectKey = 'id',
+        protected ?string $selectValue = null,
+        protected string  $selectOperator = '=',
+        protected bool    $useTransaction = false,
     ) {}
 
     /**
@@ -49,14 +49,13 @@ abstract class UpdateAction extends Action
 
             $preparedData = $this->prepareData($this->data);
 
-            $this->beforeHandle($row, $preparedData);
             $this->dispatchBeforeEvent($row, $preparedData);
 
             $row->update($preparedData);
             $updated = $row->fresh();
 
             $this->dispatchAfterEvent($updated);
-            return $this->afterHandle($updated);
+            return $updated;
         };
 
         return $this->useTransaction ? DB::transaction($execute) : $execute();
@@ -74,28 +73,7 @@ abstract class UpdateAction extends Action
         return $data;
     }
 
-    /**
-     * Called before the action executes.
-     *
-     * @param Model $model The model being updated
-     * @param array $data The prepared data
-     */
-    protected function beforeHandle(Model $model, array $data): void
-    {
-        // Override in subclass for pre-update logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-update logic
-        return $result;
-    }
 
     /**
      * Dispatch event before update.

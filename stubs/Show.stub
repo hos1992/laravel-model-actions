@@ -66,7 +66,7 @@ final class {{ actionClass }} extends ShowAction
     // /**
     //  * Called before the action executes.
     //  */
-    // protected function beforeHandle(): void
+    // protected function before(): void
     // {
     //     // Pre-show logic
     // }
@@ -74,7 +74,7 @@ final class {{ actionClass }} extends ShowAction
     // /**
     //  * Called after the action executes.
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-show logic
     //     return $result;

@@ -41,10 +41,8 @@ final class {{ actionClass }} extends BulkDeleteAction
 
     // /**
     //  * Called before the action executes.
-    //  *
-    //  * @param array $ids The IDs being deleted
     //  */
-    // protected function beforeHandle(array $ids): void
+    // protected function before(): void
     // {
     //     // Pre-bulk-delete logic
     // }
@@ -54,7 +52,7 @@ final class {{ actionClass }} extends BulkDeleteAction
     //  *
     //  * @param mixed $result The count of deleted records
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-bulk-delete logic
     //     return $result;

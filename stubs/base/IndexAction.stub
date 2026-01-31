@@ -11,17 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class IndexAction extends Action
 {
-    private ?Model $model;
-    private int $perPage;
-    private bool $getAll = false;
-    private string $orderKey = 'id';
-    private string $orderDir = 'DESC';
-    private array $select = [];
-    private array $with = [];
-    private array $withOut = [];
-    private array $where = [];
-    private ?string $searchTerm = null;
-    private array $searchColumns = [];
+    protected ?Model $model;
+    protected int $perPage;
+    protected bool $getAll = false;
+    protected string $orderKey = 'id';
+    protected string $orderDir = 'DESC';
+    protected array $select = [];
+    protected array $with = [];
+    protected array $withOut = [];
+    protected array $where = [];
+    protected ?string $searchTerm = null;
+    protected array $searchColumns = [];
 
     /**
      * Create a new IndexAction instance.
@@ -95,8 +95,6 @@ abstract class IndexAction extends Action
             throw new Exception('There is no model instance passed to the action!');
         }
 
-        $this->beforeHandle();
-
         $query = $this->model->query();
 
         if (count($this->select)) {
@@ -126,7 +124,7 @@ abstract class IndexAction extends Action
 
         $this->dispatchEvent($result);
 
-        return $this->afterHandle($result);
+        return $result;
     }
 
     /**
@@ -160,25 +158,7 @@ abstract class IndexAction extends Action
         // Override in subclass for custom query logic
     }
 
-    /**
-     * Called before the action executes.
-     */
-    protected function beforeHandle(): void
-    {
-        // Override in subclass for pre-index logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-index logic
-        return $result;
-    }
 
     /**
      * Dispatch event after retrieval.

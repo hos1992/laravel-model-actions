@@ -81,7 +81,6 @@ abstract class BulkUpdateAction extends Action
             $instance = new $modelClass();
             $preparedData = $this->prepareData($this->data);
 
-            $this->beforeHandle($this->ids, $preparedData);
             $this->dispatchBeforeEvent($this->ids, $preparedData);
 
             $totalUpdated = 0;
@@ -101,7 +100,7 @@ abstract class BulkUpdateAction extends Action
             }
 
             $this->dispatchAfterEvent($this->ids, $totalUpdated);
-            return $this->afterHandle($totalUpdated);
+            return $totalUpdated;
         };
 
         return $this->useTransaction ? DB::transaction($execute) : $execute();
@@ -119,28 +118,7 @@ abstract class BulkUpdateAction extends Action
         return $data;
     }
 
-    /**
-     * Called before the action executes.
-     *
-     * @param array $ids The IDs being updated
-     * @param array $data The prepared data
-     */
-    protected function beforeHandle(array $ids, array $data): void
-    {
-        // Override in subclass for pre-update logic
-    }
 
-    /**
-     * Called after the action executes.
-     *
-     * @param mixed $result
-     * @return mixed
-     */
-    protected function afterHandle(mixed $result): mixed
-    {
-        // Override in subclass for post-update logic
-        return $result;
-    }
 
     /**
      * Dispatch event before bulk update.

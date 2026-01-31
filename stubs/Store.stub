@@ -45,10 +45,8 @@ final class {{ actionClass }} extends StoreAction
 
     // /**
     //  * Called before the action executes.
-    //  *
-    //  * @param array $data The prepared data
     //  */
-    // protected function beforeHandle(array $data): void
+    // protected function before(): void
     // {
     //     // Pre-store logic
     // }
@@ -58,7 +56,7 @@ final class {{ actionClass }} extends StoreAction
     //  *
     //  * @param mixed $result The created model
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-store logic
     //     return $result;

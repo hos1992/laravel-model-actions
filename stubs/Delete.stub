@@ -45,10 +45,8 @@ final class {{ actionClass }} extends DeleteAction
 
     // /**
     //  * Called before the action executes.
-    //  *
-    //  * @param Model $model The model being deleted
     //  */
-    // protected function beforeHandle(Model $model): void
+    // protected function before(): void
     // {
     //     // Pre-delete logic
     // }
@@ -58,7 +56,7 @@ final class {{ actionClass }} extends DeleteAction
     //  *
     //  * @param mixed $result Returns true on success
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-delete logic
     //     return $result;

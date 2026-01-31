@@ -81,7 +81,7 @@ final class {{ actionClass }} extends IndexAction
     // /**
     //  * Called before the action executes.
     //  */
-    // protected function beforeHandle(): void
+    // protected function before(): void
     // {
     //     // Pre-index logic
     // }
@@ -89,7 +89,7 @@ final class {{ actionClass }} extends IndexAction
     // /**
     //  * Called after the action executes.
     //  */
-    // protected function afterHandle(mixed $result): mixed
+    // protected function after(mixed $result): mixed
     // {
     //     // Post-index logic
     //     return $result;
