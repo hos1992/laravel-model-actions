@@ -574,22 +574,25 @@ use {{ modelPath }}\{{ model }};
 final class {{ actionClass }} extends BaseBulkDeleteAction
 {
     /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param array $ids The IDs of records to delete
+     * @param bool $forceDelete Whether to force delete (permanently)
+     */
+    public function __construct(
+        array $ids = [],
+        bool $forceDelete = false
+    ) {
+        parent::__construct($ids, $forceDelete);
+    }
+
+    /**
      * Get the model class.
      */
     protected function model(): string
     {
         return {{ model }}::class;
     }
-
-    /**
-     * Usage Examples:
-     *
-     * // Delete multiple records by IDs:
-     * {{ actionClass }}::run(ids: [1, 2, 3, 4, 5]);
-     *
-     * // Force delete (permanently) records:
-     * {{ actionClass }}::run(ids: [1, 2, 3], forceDelete: true);
-     */
 }
 STUB;
     }
@@ -610,6 +613,19 @@ use {{ modelPath }}\{{ model }};
 final class {{ actionClass }} extends BaseBulkUpdateAction
 {
     /**
+     * Create a new {{ actionClass }} instance.
+     *
+     * @param array $ids The IDs of records to update
+     * @param array $data The data to update
+     */
+    public function __construct(
+        array $ids = [],
+        array $data = []
+    ) {
+        parent::__construct($ids, $data);
+    }
+
+    /**
      * Get the model class.
      */
     protected function model(): string
@@ -625,22 +641,6 @@ final class {{ actionClass }} extends BaseBulkUpdateAction
         // Add any data transformations here
         return $data;
     }
-
-    /**
-     * Usage Examples:
-     *
-     * // Update multiple records by IDs:
-     * {{ actionClass }}::run(
-     *     ids: [1, 2, 3, 4, 5],
-     *     data: ['status' => 'active', 'updated_by' => auth()->id()]
-     * );
-     *
-     * // Update with prepared/transformed data:
-     * {{ actionClass }}::run(
-     *     ids: [1, 2, 3],
-     *     data: ['is_verified' => true]
-     * );
-     */
 }
 STUB;
     }
