@@ -93,10 +93,10 @@ return [
     |
     */
 
-    'cache' => [
-        'enabled' => env('MODEL_ACTIONS_CACHE_ENABLED', false),
-        'ttl' => env('MODEL_ACTIONS_CACHE_TTL', 60),
-        'prefix' => 'model_actions',
-    ],
+    // 'cache' => [
+    //     'enabled' => env('MODEL_ACTIONS_CACHE_ENABLED', false),
+    //     'ttl' => env('MODEL_ACTIONS_CACHE_TTL', 60),
+    //     'prefix' => 'model_actions',
+    // ],
 
 ];

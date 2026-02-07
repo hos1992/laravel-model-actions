@@ -18,11 +18,11 @@ final class {{ actionClass }} extends UpdateAction
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        protected array   $data,
-        protected string  $selectKey = 'id',
-        protected ?string $selectValue = null,
-        protected string  $selectOperator = '=',
-        protected bool    $useTransaction = false,
+        private array   $data,
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+        private bool    $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),

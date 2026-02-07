@@ -22,15 +22,15 @@ final class {{ actionClass }} extends ShowAction
      * @param bool $failIfNotFound Whether to throw exception if not found
      */
     public function __construct(
-        protected string  $selectKey = 'id',
-        protected ?string $selectValue = null,
-        protected string  $selectOperator = '=',
-        protected array   $select = [],
-        protected array   $with = [],
-        protected array   $withOut = [],
-        protected string  $orderKey = 'id',
-        protected string  $orderDir = 'DESC',
-        protected bool    $failIfNotFound = false,
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+        private array   $select = [],
+        private array   $with = [],
+        private array   $withOut = [],
+        private string  $orderKey = 'id',
+        private string  $orderDir = 'DESC',
+        private bool    $failIfNotFound = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),

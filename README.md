@@ -13,7 +13,7 @@ A Laravel package for generating action classes for Eloquent models with built-i
 - 🪝 **Lifecycle Hooks** - Before/after hooks for custom logic injection
 - 📦 **Bulk Operations** - BulkDelete and BulkUpdate actions for multiple records
 - 🔍 **Query Filters** - Built-in search, sort, and date range filtering
-- 💾 **Caching Support** - Optional caching with tags and TTL configuration
+- 🔍 **Query Filters** - Built-in search, sort, and date range filtering
 
 ## Installation
 
@@ -531,16 +531,13 @@ namespace App\Actions\User;
 
 use App\Actions\Action;
 use App\Models\User;
-use HosnyAdeeb\ModelActions\Traits\Cacheable;
 use HosnyAdeeb\ModelActions\Traits\Filterable;
 
 final class UserSearchAction extends Action
 {
-    use Filterable, Cacheable;
+    use Filterable;
 
     protected array $searchable = ['name', 'email', 'profile.bio'];
-    protected ?int $cacheTtl = 15;
-    protected array $cacheTags = ['users', 'search'];
 
     public function __construct(
         private array $filters = []
@@ -550,11 +547,9 @@ final class UserSearchAction extends Action
 
     public function handle(): mixed
     {
-        return $this->remember(function () {
-            $query = User::query()->with('profile');
-            $this->applyFilters($query);
-            return $query->paginate(20);
-        });
+        $query = User::query()->with('profile');
+        $this->applyFilters($query);
+        return $query->paginate(20);
     }
 }
 ```
@@ -641,99 +636,6 @@ protected array $searchable = [
     'profile.bio',      // Searches profile.bio relationship
     'roles.name',       // Searches roles.name relationship
 ];
-```
-
-## Caching Support
-
-The `Cacheable` trait provides optional caching for read operations.
-
-### Configuration
-
-Add to your `.env`:
-
-```env
-MODEL_ACTIONS_CACHE_ENABLED=true
-MODEL_ACTIONS_CACHE_TTL=60
-```
-
-Or in `config/model-actions.php`:
-
-```php
-'cache' => [
-    'enabled' => true,
-    'ttl' => 60,        // Minutes
-    'prefix' => 'model_actions',
-],
-```
-
-### Using Cacheable Trait
-
-```php
-<?php
-
-namespace App\Actions\User;
-
-use App\Actions\_Base\IndexAction;
-use App\Models\User;
-use HosnyAdeeb\ModelActions\Traits\Cacheable;
-
-final class UserIndexAction extends IndexAction
-{
-    use Cacheable;
-
-    // Cache for 30 minutes (overrides config)
-    protected ?int $cacheTtl = 30;
-
-    // Cache tags for grouped invalidation
-    protected array $cacheTags = ['users', 'listings'];
-
-    public function handle(): mixed
-    {
-        return $this->remember(function () {
-            return User::with('roles')->paginate(20);
-        });
-    }
-}
-```
-
-### Cache Methods
-
-```php
-// Disable cache for a specific call
-$users = (new UserIndexAction())->withoutCache()->execute();
-
-// Enable cache explicitly
-$users = (new UserIndexAction())->withCache()->execute();
-
-// Set custom cache key
-$users = (new UserIndexAction())->setCacheKey('users_list_v2')->execute();
-
-// Set custom TTL
-$users = (new UserIndexAction())->setCacheTtl(120)->execute();
-
-// Set cache tags
-$users = (new UserIndexAction())->setCacheTags(['users'])->execute();
-```
-
-### Cache Invalidation
-
-Clear cache in write actions:
-
-```php
-final class UserStoreAction extends StoreAction
-{
-    use Cacheable;
-
-    protected array $cacheTags = ['users'];
-
-    protected function after(mixed $result): mixed
-    {
-        // Clear all caches with 'users' tag
-        $this->clearCacheByTags(['users']);
-
-        return $result;
-    }
-}
 ```
 
 ## Bulk Actions

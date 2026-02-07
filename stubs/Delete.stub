@@ -18,11 +18,11 @@ final class {{ actionClass }} extends DeleteAction
      * @param bool $useTransaction Whether to wrap in a database transaction
      */
     public function __construct(
-        protected string  $selectKey = 'id',
-        protected ?string $selectValue = null,
-        protected string  $selectOperator = '=',
-        protected bool    $forceDelete = false,
-        protected bool    $useTransaction = false,
+        private string  $selectKey = 'id',
+        private ?string $selectValue = null,
+        private string  $selectOperator = '=',
+        private bool    $forceDelete = false,
+        private bool    $useTransaction = false,
     ) {
         parent::__construct(
             model: new {{ model }}(),

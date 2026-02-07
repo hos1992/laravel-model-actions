@@ -24,17 +24,17 @@ final class {{ actionClass }} extends IndexAction
      * @param array $request Additional request data for custom queries
      */
     public function __construct(
-        protected ?int    $perPage = null,
-        protected bool    $getAll = false,
-        protected ?string $orderKey = 'id',
-        protected ?string $orderDir = 'DESC',
-        protected array   $select = [],
-        protected array   $with = [],
-        protected array   $withOut = [],
-        protected array   $where = [],
-        protected ?string $searchTerm = null,
-        protected array   $searchColumns = [],
-        protected array   $request = [],
+        private ?int    $perPage = null,
+        private bool    $getAll = false,
+        private ?string $orderKey = 'id',
+        private ?string $orderDir = 'DESC',
+        private array   $select = [],
+        private array   $with = [],
+        private array   $withOut = [],
+        private array   $where = [],
+        private ?string $searchTerm = null,
+        private array   $searchColumns = [],
+        private array   $request = [],
     ) {
         parent::__construct(
             model: new {{ model }}(),
